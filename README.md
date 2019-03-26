@@ -1,2 +1,2 @@
 # YelpCamp
-Recreat YeapCamp with MEAN stack
+Recreat YelpCamp with MEAN stack
