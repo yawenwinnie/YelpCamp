@@ -1,37 +1,18 @@
 var express      = require("express"),
     app          = express(),
     badyParser   = require("body-parser"),
-    mongoose     = require("mongoose");
+    mongoose     = require("mongoose"),
+    Campground   = require('./models/campground'),
+    seedDB       = require('./seeds');
+
 
 mongoose.connect('mongodb://localhost:27017/yelp_camp', { useNewUrlParser: true});
 
 app.use(badyParser.urlencoded({extended: true}));
 app.set("view engine", "ejs");
+// seedDB();
 
-//define a pattern for the documents
-var campgroundSchema = new mongoose.Schema({
-    name: String,
-    image: String,
-    description: String,
-});
-
-Campground = mongoose.model('Campground', campgroundSchema);
-        //
-        // Campground.create(
-        //     {
-        //         name: "Second Ground",
-        //         image: "https://farm4.staticflickr.com/3211/3062207412_03acc28b80.jpg",
-        //         description: "This is a huge hill",
-        //
-        //     }, function(err, campground){
-        //         if(err){
-        //             console.log("ERROR");
-        //         }else{
-        //             console.log('Newly created campground');
-        //             console.log(campground);
-        //         }
-        //     });
-
+//////////////////////Routing///////////////////////////
 app.get("/", function(req, res){
     res.render("landing");
 });
@@ -75,18 +56,23 @@ app.post("/campgrounds", function(req, res){
 
 
 
-//SHOW, must be decalred after /new
+//SHOW, must be declared after /new
 app.get("/campgrounds/:id", function(req, res){
-    Campground.findById(req.params.id, function(err, foundCampground){
+    Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
         if(err){
-            console.error.bind(console, "error");
-        }else{
+            console.log(err);
+        } else {
+
+            //render show template with that campground
             res.render("show", {campground: foundCampground});
         }
-
     });
 });
 
+
+
+
+//////////////////appListen/////////////////////////
 app.listen(3000, function(){
     console.log("Server running");
 });
