@@ -17,20 +17,24 @@ router.get("/", function(req, res){
 });
 
 //NEW
-router.get("/new", function(req, res){
+router.get("/new", isLogedIn, function(req, res){
     //find the template with that campground
     res.render("campgrounds/new");
 });
 
 //CREAT
-router.post("/", function(req, res){
+router.post("/", isLogedIn, function(req, res){
     console.log(req.body.description);
 
     Campground.create(
         {
             name: req.body.name,
             image: req.body.image,
-            description: req.body.description
+            description: req.body.description,
+            author: {
+                id: req.user._id,
+                username: req.user.username,
+            }
 
         }, function(err, campground){
             if(err){
@@ -56,6 +60,13 @@ router.get("/:id", function(req, res){
         }
     });
 });
+
+function isLogedIn(req, res, next){
+    if(req.isAuthenticated()){
+        return next();
+    }
+    res.redirect('/login');
+}
 
 module.exports = router;
 //all the routes for campgrounds has been added to router
