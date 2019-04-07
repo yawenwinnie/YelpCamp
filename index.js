@@ -5,6 +5,7 @@ var express         = require("express"),
     passport        = require("passport"),
     LocalStrategy   = require("passport-local"),
     mongoose        = require("mongoose"),
+    flash           = require('connect-flash'),
     Campground      = require('./models/campground'),
     Comment         = require('./models/comment'),
     User            = require('./models/user'),
@@ -21,6 +22,7 @@ app.use(badyParser.urlencoded({extended: true}));
 app.use(express.static(__dirname + "/public"));
 app.set("view engine", "ejs");
 app.use(methodOverride("_method"));
+app.use(flash());
 // seedDB();
 
 ///////////////////Passport configuration///////////
@@ -39,6 +41,8 @@ passport.deserializeUser(User.deserializeUser());//unencoding the session
 //middleware for every single route
 app.use(function(req, res, next){
     res.locals.currentUser = req.user;//currentUser is now available in every template
+    res.locals.error = req.flash("error");
+    res.locals.success = req.flash("success");
     next();
 });
 

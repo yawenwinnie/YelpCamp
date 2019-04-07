@@ -9,9 +9,8 @@ var middleware = require("../middleware/index");
 //INDEX
 router.get("/", function(req, res){
     Campground.find({}, function(err, allCampgrounds){
-        if(err) {
-            console.log("ERROR");
-        }else{
+        if(err) {}
+        else{
             res.render("campgrounds/index", {campgrounds: allCampgrounds, currentUser: req.user});
         }
     });
@@ -25,7 +24,6 @@ router.get("/new", middleware.isLoggedIn, function(req, res){
 
 //CREAT
 router.post("/", middleware.isLoggedIn, function(req, res){
-    console.log(req.body.description);
 
     Campground.create(
         {
@@ -39,7 +37,6 @@ router.post("/", middleware.isLoggedIn, function(req, res){
 
         }, function(err, campground){
             if(err){
-                console.log("ERROR");
             }else{
                 res.redirect("/campgrounds");
             }
@@ -53,7 +50,7 @@ router.post("/", middleware.isLoggedIn, function(req, res){
 router.get("/:id", function(req, res){
     Campground.findById(req.params.id).populate("comments").exec(function(err, foundCampground){
         if(err){
-            console.log(err);
+            req.flash("error", "Campground not found");
         } else {
 
             //render show template with that campground
@@ -74,6 +71,7 @@ router.get('/:id/edit', middleware.checkCampgroundOwnership, function(req, res){
 router.put('/:id', middleware.checkCampgroundOwnership, function(req,res){
     Campground.findByIdAndUpdate(req.params.id, req.body.campground, function(err, updatedCampground){
         if(err){
+            req.flash("error", "Campground not found");
             red.redirect("/campgrounds");
         }else{
             res.redirect("/campgrounds/" + req.params.id);
@@ -86,6 +84,7 @@ router.put('/:id', middleware.checkCampgroundOwnership, function(req,res){
 router.delete('/:id', middleware.checkCampgroundOwnership, function(req, res){
     Campground.findByIdAndRemove(req.params.id, function(err){
         if(err){
+            req.flash("error", "Campground not found");
             res.redirect('/campground');
         }else{
             res.redirect('/campgrounds');
